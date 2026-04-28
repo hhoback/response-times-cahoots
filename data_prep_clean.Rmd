@@ -1,9 +1,9 @@
 ---
-title: "DSCI410 Research Project"
+title: "Data Cleaning: EPD Response Times"
 output: html_notebook
 ---
 
-``` {r packages}
+``` {r Load ackages}
 library(dplyr)
 library(tidyr)
 ```
@@ -72,4 +72,7 @@ combined <- combined %>%
     TRUE ~ NA_character_))
 ```
 
+``` {r Save to CSV}
+write.csv(combined, "epd_spd_cleaned.csv", row.names = FALSE)
+```
 
