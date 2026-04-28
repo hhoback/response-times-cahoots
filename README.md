@@ -17,7 +17,7 @@ The goal of this stage is to:
 
 ## Input Files
 
-- `2015-2025 SPD Calls for Service`
+- `2015-2025 SPD Calls for Service.xlsx`
 - `EugeneCAD2015noloc.csv`
 - `EugeneCAD2016noloc.csv`
 - `EugeneCAD2017noloc.csv`
