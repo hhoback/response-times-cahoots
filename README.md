@@ -34,6 +34,10 @@ The goal of this stage is to:
 
 - `epd_spd_cleaned.csv`: Cleaned and merged EPD and SPD call data containing variables: `yr`, `inci_id`, `agency`, `calltime`, `priority`, `callsource`, `mins_to_arrv`, `post_shutdown`, `priority_group`
 
+Note: Because of GitHUB file size limits, the raw data and cleaned dataset are not included in this repository. To produce the cleaned dataset:
+- Import all raw data input files to an Rmd notebook
+- Run `data_prep_clean.Rmd` using the "How to Run" section instructions
+
 ## How to Run
 
 Run all chunks in the Rmd file `data_prep_clean.Rmd`.
