@@ -3,7 +3,7 @@ title: "Data Cleaning: EPD Response Times"
 output: html_notebook
 ---
 
-``` {r Load ackages}
+``` {r Load packages}
 library(dplyr)
 library(tidyr)
 ```
