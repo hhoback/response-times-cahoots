@@ -3,6 +3,8 @@ title: "DSCI410 Research Project"
 output: html_notebook
 ---
 
+## Load packages
+
 ``` {r packages}
 library(dplyr)
 library(tidyr)
