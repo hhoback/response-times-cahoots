@@ -13,7 +13,7 @@ The goal of this stage is to:
 
 ## Folder Contents
 
-- `data_prep_clean.Rmd`: Loads raw data, fixes formatting issues, and outputs a cleaned version.
+- `data_prep_clean.Rmd`: Loads raw data, fixes formatting issues, removes null values, combines data, creates new variables, and outputs a cleaned version ready for analysis. 
 
 ## Input Files
 
