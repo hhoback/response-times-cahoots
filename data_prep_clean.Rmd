@@ -1,0 +1,75 @@
+---
+title: "DSCI410 Research Project"
+output: html_notebook
+---
+
+``` {r packages}
+library(dplyr)
+library(tidyr)
+```
+
+```{r Stack data}
+# Combine each yearly EPD dataset 
+eug_combined <- bind_rows(EugeneCAD2015noloc, EugeneCAD2016noloc, EugeneCAD2017noloc, EugeneCAD2018noloc, EugeneCAD2019noloc, EugeneCAD2020noloc, EugeneCAD2021noloc, EugeneCAD2022noloc, EugeneCAD2023noloc, EugeneCAD2024noloc, EugeneCAD2025noloc)
+
+
+spd_dfs <- list(X2015SPD, X2016SPD, X2017SPD, X2018SPD, X2019SPD, X2020SPD, X2021SPD, X2022SPD, X2023SPD, X2024SPD, X2025SPD)
+
+# Convert priority to numeric in order to combine
+spd_dfs <- lapply(spd_dfs, function(df) {
+  df$Priority <- as.numeric(df$Priority)
+  df
+})
+
+# Combine each yearly SPD dataset
+spd_combined <- bind_rows(spd_dfs)
+```
+
+```{r Data Cleaning}
+# Create a 'year' column for the SPD data
+spd_combined$year <- format(spd_combined$'Call Creation Time', "%Y")
+
+# Remove all calls self-reported by the police and any null values in variables of interest
+spd_combined <- spd_combined %>%
+  filter(`Call Creation Mechanism` != "SELF") %>%
+  mutate(across(where(is.character), ~ na_if(.x, "NULL"))) %>%
+  drop_na(`Responding Agency`, `Call Creation Time`, `First Dispatched Time`, `First Arrival Time`, Priority, year) %>%
+  mutate(across(c(`First Dispatched Time`, `First Arrival Time`, `Clear Time`, year, Priority), as.numeric)) %>%
+  mutate(mins_to_arrv = (`First Arrival Time` - `First Dispatched Time`) * 24 * 60)
+  
+
+# Remove all calls self-reported by the Eugene police, calls responded to by CAHOOTS, and any null values in variables of interest
+eug_combined <- eug_combined %>%
+  filter(`callsource` != "SELF") %>%
+  filter(`agency` != "CAHE") %>%
+  mutate(across(where(is.character), ~ na_if(.x, "NULL"))) %>%
+  drop_na(yr, agency, calltime, secs_to_arrv, priority) %>%
+  mutate(across(c(`secs_to_arrv`, yr, priority), as.numeric)) %>%
+  mutate(mins_to_arrv = secs_to_arrv / 60)
+
+# Rename SPD columns to match the EPD dataset
+spd_combined <- spd_combined %>%
+  rename(
+    yr = year, inci_id = `Incident Number`, agency = `Responding Agency`, calltime = `Call Creation Time`, priority = Priority, callsource = `Call Creation Mechanism`)
+```
+
+``` {r Combine datasets}
+# Combine SPD and EPD datasets into one based on common variables of interest
+combined <- bind_rows(
+  spd_combined %>% select(yr, inci_id, agency, calltime, priority, callsource, mins_to_arrv),
+  eug_combined %>% select(yr, inci_id, agency, calltime, priority, callsource, mins_to_arrv)
+)
+```
+
+``` {r Create new variables}
+combined <- combined %>% 
+  mutate(`post_shutdown` = ifelse(yr == 2025, 1, 0)) %>%
+  mutate(priority_group = case_when(
+    priority %in% c(1, 2) ~ "1-2",
+    priority %in% c(3, 4) ~ "3-4",
+    priority %in% c(5, 6) ~ "5-6",
+    priority %in% 7:9     ~ "7-9",
+    TRUE ~ NA_character_))
+```
+
+
