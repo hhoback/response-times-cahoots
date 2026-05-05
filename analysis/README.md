@@ -54,4 +54,3 @@ This project uses the following R packages:
 - tidyverse
 - ggplot2
 - stats
-- base R
