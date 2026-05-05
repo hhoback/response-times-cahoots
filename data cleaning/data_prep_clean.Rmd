@@ -4,53 +4,103 @@ output: html_notebook
 ---
 
 ``` {r Load packages}
-library(dplyr)
-library(tidyr)
+library(readxl)
+library(tidyverse)
+library(lubridate)
+```
+
+```{r Load data}
+eug2015 <- read.csv("data/EugeneCAD2015noloc.csv")
+eug2016 <- read.csv("data/EugeneCAD2016noloc.csv")
+eug2017 <- read.csv("data/EugeneCAD2017noloc.csv")
+eug2018 <- read.csv("data/EugeneCAD2018noloc.csv")
+eug2019 <- read.csv("data/EugeneCAD2019noloc.csv")
+eug2020 <- read.csv("data/EugeneCAD2020noloc.csv")
+eug2021 <- read.csv("data/EugeneCAD2021noloc.csv")
+eug2022 <- read.csv("data/EugeneCAD2022noloc.csv")
+eug2023 <- read.csv("data/EugeneCAD2023noloc.csv")
+eug2024 <- read.csv("data/EugeneCAD2024noloc.csv")
+eug2025 <- read.csv("data/EugeneCAD2025noloc.csv")
+
+spd2015 <- read_excel("data/2015-2025 SPD Calls for Service.xlsx", sheet = "2015")
+spd2016 <- read_excel("data/2015-2025 SPD Calls for Service.xlsx", sheet = "2016")
+spd2017 <- read_excel("data/2015-2025 SPD Calls for Service.xlsx", sheet = "2017")
+spd2018 <- read_excel("data/2015-2025 SPD Calls for Service.xlsx", sheet = "2018")
+spd2019 <- read_excel("data/2015-2025 SPD Calls for Service.xlsx", sheet = "2019")
+spd2020 <- read_excel("data/2015-2025 SPD Calls for Service.xlsx", sheet = "2020")
+spd2021 <- read_excel("data/2015-2025 SPD Calls for Service.xlsx", sheet = "2021")
+spd2022 <- read_excel("data/2015-2025 SPD Calls for Service.xlsx", sheet = "2022")
+spd2023 <- read_excel("data/2015-2025 SPD Calls for Service.xlsx", sheet = "2023")
+spd2024 <- read_excel("data/2015-2025 SPD Calls for Service.xlsx", sheet = "2024")
+spd2025 <- read_excel("data/2015-2025 SPD Calls for Service.xlsx", sheet = "2025")
 ```
 
 ```{r Stack data}
-# Combine each yearly EPD dataset 
-eug_combined <- bind_rows(EugeneCAD2015noloc, EugeneCAD2016noloc, EugeneCAD2017noloc, EugeneCAD2018noloc, EugeneCAD2019noloc, EugeneCAD2020noloc, EugeneCAD2021noloc, EugeneCAD2022noloc, EugeneCAD2023noloc, EugeneCAD2024noloc, EugeneCAD2025noloc)
+# Create a list of datasets from each year
+eug_dfs <- list(eug2015, eug2016, eug2017, eug2018, eug2019, eug2020, eug2021, eug2022, eug2023, eug2024, eug2025)
 
+spd_dfs <- list(spd2015, spd2016, spd2017, spd2018, spd2019, spd2020, spd2021, spd2022, spd2023, spd2024, spd2025)
 
-spd_dfs <- list(X2015SPD, X2016SPD, X2017SPD, X2018SPD, X2019SPD, X2020SPD, X2021SPD, X2022SPD, X2023SPD, X2024SPD, X2025SPD)
-
-# Convert priority to numeric in order to combine
+# In order to combine the datasets, the priority column must be numeric values, so we convert them
 spd_dfs <- lapply(spd_dfs, function(df) {
   df$Priority <- as.numeric(df$Priority)
   df
 })
 
-# Combine each yearly SPD dataset
+# Combine each yearly Eugene and Springfield dataset
+eug_combined <- bind_rows(eug_dfs)
 spd_combined <- bind_rows(spd_dfs)
 ```
 
 ```{r Data Cleaning}
-# Create a 'year' column for the SPD data
-spd_combined$year <- format(spd_combined$'Call Creation Time', "%Y")
 
-# Remove all calls self-reported by the police and any null values in variables of interest
 spd_combined <- spd_combined %>%
+  mutate(
+    # Convert the times to datetimes and numbers to make them useable
+    `Call Creation Time` = as.POSIXct(`Call Creation Time`), 
+    `First Dispatched Time` = as.numeric(`First Dispatched Time`),
+    `First Arrival Time` = as.numeric(`First Arrival Time`),
+    
+    # Create a 'year' column for the SPD data
+    Year = year(`Call Creation Time`),
+    
+    # Calculate number of minutes to arrive from arrival and dispatch times 
+    mins_to_arrv = (`First Arrival Time` - `First Dispatched Time`) * 24 * 60) %>%
+  
+  # Remove all calls self-reported by the police and any null values in variables of interest
   filter(`Call Creation Mechanism` != "SELF") %>%
   mutate(across(where(is.character), ~ na_if(.x, "NULL"))) %>%
-  drop_na(`Responding Agency`, `Call Creation Time`, `First Dispatched Time`, `First Arrival Time`, Priority, year) %>%
-  mutate(across(c(`First Dispatched Time`, `First Arrival Time`, `Clear Time`, year, Priority), as.numeric)) %>%
-  mutate(mins_to_arrv = (`First Arrival Time` - `First Dispatched Time`) * 24 * 60)
-  
+  drop_na(`Responding Agency`, `First Dispatched Time`, `First Arrival Time`, Priority)
 
-# Remove all calls self-reported by the Eugene police, calls responded to by CAHOOTS, and any null values in variables of interest
 eug_combined <- eug_combined %>%
-  filter(`callsource` != "SELF") %>%
-  filter(`agency` != "CAHE") %>%
+  mutate(
+    # Convert times to datetimes and other variables to numbers to make them useable
+    calltime = as.POSIXct(calltime, tz = "pst"),
+    secs_to_arrv = as.numeric(secs_to_arrv),
+    yr = as.numeric(yr),
+    priority = as.numeric(priority),
+    
+    # Calculate number of minutes to arrive from seconds to arrive
+    mins_to_arrv = secs_to_arrv / 60
+    ) %>%
+  
+  # Remove all calls self-reported by the Eugene police, calls responded to by CAHOOTS, and any null values in variables of interest
+  filter(callsource %in% c("PHONE", "E911", "W911"),
+         agency != "CAHE",
+         primeunit != "_CAHOT") %>%
   mutate(across(where(is.character), ~ na_if(.x, "NULL"))) %>%
-  drop_na(yr, agency, calltime, secs_to_arrv, priority) %>%
-  mutate(across(c(`secs_to_arrv`, yr, priority), as.numeric)) %>%
-  mutate(mins_to_arrv = secs_to_arrv / 60)
+  drop_na(yr, agency, calltime, secs_to_arrv, priority)
 
 # Rename SPD columns to match the EPD dataset
 spd_combined <- spd_combined %>%
   rename(
-    yr = year, inci_id = `Incident Number`, agency = `Responding Agency`, calltime = `Call Creation Time`, priority = Priority, callsource = `Call Creation Mechanism`)
+    yr = Year, 
+    inci_id = `Incident Number`, 
+    agency = `Responding Agency`, 
+    calltime = `Call Creation Time`, 
+    priority = Priority, 
+    callsource = `Call Creation Mechanism`
+    )
 ```
 
 ``` {r Combine datasets}
@@ -61,15 +111,10 @@ combined <- bind_rows(
 )
 ```
 
-``` {r Create new variables}
-combined <- combined %>% 
-  mutate(`post_shutdown` = ifelse(yr == 2025, 1, 0)) %>%
-  mutate(priority_group = case_when(
-    priority %in% c(1, 2) ~ "1-2",
-    priority %in% c(3, 4) ~ "3-4",
-    priority %in% c(5, 6) ~ "5-6",
-    priority %in% 7:9     ~ "7-9",
-    TRUE ~ NA_character_))
+``` {r Clean combined dataset}
+# Remove any arrival times less than 0 (impossible) or more than 120 (too long)
+combined <- combined %>%
+  filter(mins_to_arrv >= 0 & mins_to_arrv <= 120)
 ```
 
 ``` {r Save to CSV}
