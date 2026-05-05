@@ -16,9 +16,11 @@ The goal of this stage is to:
 `initial_analysis.Rmd`: 
 - Loads clean data, creates new variables, groups variables, calculates average response time, and plots those times on a line plot to compare cities over time
 - Output: Line plots, interpretation of results
+
 `parallel_trends.Rmd`:
 - Filters the data for pre-shutdown, finds average response time by treatment group, visualizes parallel trends, runs a regression on these trends, and outputs results that determine if DiD can occur
 - Output: `results_pt.csv`, line plots, interpretation of results
+
 `diff_in_diff.Rmd`:
 - Performs the main data analysis through a difference in differences study by definining a shutdown period, estimating the model, determining causal effect, controlling for other variables, and plotting the results through a coefficient plot.
 - Output: `results_dd.csv`, coefficient plot, interpretation of results
