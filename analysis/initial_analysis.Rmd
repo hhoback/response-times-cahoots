@@ -1,0 +1,48 @@
+---
+title: "Initial Data Analysis"
+output: html_notebook
+---
+``` {r Load packages}
+library(tidyverse)
+library(stats)
+library(ggplot2)
+```
+
+``` {r Load clean data}
+clean_data <- read.csv("epd_spd_cleaned.csv")
+```
+
+``` {r Create new variables}
+clean_data <- clean_data %>% 
+  mutate(
+    post_shutdown = ifelse(calltime >= as.POSIXct("2025-04-05"), 1, 0),
+    priority_group = case_when(
+      priority %in% c(1, 2) ~ "1-2",
+      priority %in% c(3, 4) ~ "3-4",
+      priority %in% c(5, 6) ~ "5-6",
+      priority %in% 7:9     ~ "7-9",
+      TRUE ~ NA_character_))
+```
+
+```{r Group data}
+avg_by_year <- clean_data %>%
+  group_by(yr, agency) %>%
+  summarise(
+    avg_response_time = mean(mins_to_arrv, na.rm = TRUE),
+    n = n()
+  )
+```
+
+```{r Plot average response times}
+library(ggplot2)
+
+ggplot(avg_by_year, aes(x = yr, y = avg_response_time, color = agency, group = agency)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  labs(
+    x = "Year",
+    y = "Average Response Time (minutes)",
+    color = "Agency"
+  ) 
+```
+
