@@ -4,7 +4,7 @@ This repository contains data cleaning, processing, and statistical analysis of 
 
 The repository is organized into two main parts:
 
-data cleaning/: contains data cleaning and preparation notebooks
-analysis/: contains statistical analysis notebooks
+`data cleaning/`: contains data cleaning and preparation notebooks
+`analysis/`: contains statistical analysis notebooks
 
 For more details, see the individual README files in the cleaning and analysis folders.
