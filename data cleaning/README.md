@@ -13,7 +13,7 @@ The goal of this stage is to:
 
 ## Folder Contents
 
-- `data_prep_clean.Rmd`: Loads raw data, fixes formatting issues, removes null values, combines data, creates new variables, and outputs a cleaned version ready for analysis. 
+- `clean_data.Rmd`: Loads raw data, fixes formatting issues, removes null values, combines data, creates new variables, and outputs a cleaned version ready for analysis.
 
 ## Input Files
 
@@ -32,14 +32,14 @@ The goal of this stage is to:
 
 ## Output Files
 
-- `epd_spd_cleaned.csv`: Cleaned and merged EPD and SPD call data containing variables: `yr`, `inci_id`, `agency`, `calltime`, `priority`, `callsource`, `mins_to_arrv`
+- `cleaned_eug_spd.csv`: Cleaned and merged EPD and SPD call data containing variables: `yr`, `inci_id`, `agency`, `calltime`, `priority`, `callsource`, `mins_to_arrv`
 
 ## How to Run
 
-Note: Because of GitHUB file size limits, the raw data and resulting cleaned dataset are not included in this repository. To produce the cleaned dataset:
-- Ensure all raw data files are in a `data` folder.
-- Make sure packages get imported first, and the chunks are run in order to prevent errors and messing up the data.
-- Run all chunks in the Rmd file `data_prep_clean.Rmd`.
+> Note: Because of GitHUB file size limits, the raw data and resulting cleaned dataset are not included in this repository. To produce the cleaned dataset:
+1. Ensure all raw data files are in a `data` folder.
+2. Make sure packages get imported first, and the chunks are run in order to prevent errors and messing up the data.
+3. Run all chunks in the Rmd file `clean_data.Rmd`.
 
 ## Dependencies
 
@@ -48,3 +48,5 @@ This project uses the following R packages:
 - readxl
 - tidyverse
 - lubridate
+- stats
+- ggplot2
