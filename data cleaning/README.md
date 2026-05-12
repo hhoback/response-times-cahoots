@@ -37,9 +37,9 @@ The goal of this stage is to:
 ## How to Run
 
 > Note: Because of GitHUB file size limits, the raw data and resulting cleaned dataset are not included in this repository. To produce the cleaned dataset:
-1. Ensure all raw data files are in a `data` folder.
-2. Make sure packages get imported first, and the chunks are run in order to prevent errors and messing up the data.
-3. Run all chunks in the Rmd file `clean_data.Rmd`.
+1. Ensure all raw data files are in a `data` folder. Refer to the `File Structure` section of the main `README.md` file to ensure proper structure.
+2.  Run all chunks in the Rmd file `clean_data.Rmd` in order.
+- Make sure packages get imported first, and the chunks are run in order to prevent errors and messing up the data.
 
 ## Dependencies
 
