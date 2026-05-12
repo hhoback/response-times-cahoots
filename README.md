@@ -32,3 +32,4 @@ DSCI 410 Research Project/
 ├── parallel_trends.Rmd
 └── diff_in_diff.Rmd
 ```
+[^1]Note: The cleaned .csv files are intentionally located in the root directory, not in data/
