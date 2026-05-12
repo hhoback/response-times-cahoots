@@ -1,0 +1,68 @@
+---
+title: "Parallel Trends"
+output: html_notebook
+---
+
+``` {r Load packages}
+library(tidyverse)
+library(stats)
+library(ggplot2)
+```
+
+``` {r Load clean data}
+clean_data <- read.csv("cleaned_eug_spd.csv")
+```
+
+``` {r Define new variables and filter dataset}
+clean_data <- clean_data %>% 
+  mutate(
+    # Group priority levels into groups
+    priority_group = case_when(
+      priority %in% c(1, 2) ~ "1-2",
+      priority %in% c(3, 4) ~ "3-4",
+      priority %in% c(5, 6) ~ "5-6",
+      priority %in% 7:9     ~ "7-9",
+      TRUE ~ NA_character_),
+    # Define treatment and control group
+    treatment = ifelse(agency == "EPD", 1, 0),
+    # Filter dataset for pre-shutdown (shutdown happened 2025-04-05, but we filter for last day of March to include April as a post-shutdown date, since most of the month was post-shutdown)
+    post_shutdown = ifelse(calltime > as.POSIXct("2025-04-05"), 1, 0)
+    )
+```
+
+```{r Average response times by treatment group}
+pre_shutdown <- clean_data %>%
+  # Group observations by year, treatment, and priority group
+  group_by(yr, agency, priority_group, post_shutdown) %>%
+  filter(post_shutdown == 0) %>%
+  summarise(
+    # Calculate average response time per group per year
+    avg_response_time = mean(mins_to_arrv, na.rm = TRUE),
+    n = n()
+  )
+```
+
+```{r Visualize parallel trends}
+# Plot average response times over time per priority group
+ggplot(pre_shutdown, aes(x = yr, y = avg_response_time, color = agency, group = agency)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  labs(
+    x = "Year",
+    y = "Average Response Time (minutes)",
+    color = "Agency"
+  ) +
+  facet_wrap(~ priority_group)
+```
+
+``` {r Perform regression test for parallel trends}
+model_df <- pre_shutdown %>%
+  group_by(priority_group) %>%
+  nest() %>%
+  mutate(model = map(data, ~ lm(avg_response_time ~ yr * agency, data = .x)))
+
+summary(model_df$model[[1]])
+summary(model_df$model[[2]])
+summary(model_df$model[[3]])
+summary(model_df$model[[4]])
+```
