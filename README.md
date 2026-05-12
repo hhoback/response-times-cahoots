@@ -8,6 +8,9 @@ The repository is organized into two main parts:
 
 For more details, see the individual README files in the cleaning and analysis folders.
 
+## Requirements
+All components of this project use R and the notebooks were created using RStudio. Make sure you have a program that can run R installed on your computer with the most recentversion.
+
 ## File Structure
 Reference this file structure before running any notebooks to ensure everything is in the right place and runs correctly.
 ```
@@ -33,3 +36,24 @@ DSCI 410 Research Project/
 └── diff_in_diff.Rmd
 ```
 > Note: The cleaned .csv files are intentionally located in the root directory, not in data/
+
+## How to Run
+Before running any files, ensure you have met all [Requirements] (#requirements).
+
+### 1. 'clean_data.Rmd'
+Cleans and prepares the raw data and produces an output file of the cleaned data:
+- `cleaned_eug_spd.csv` - Eugene and Springfield call data cleaned and combined into one dataset
+
+### 2. `initial_analysis.Rmd`
+Performs an initial analysis of the data, plotting average response times over time by agency.
+> Note: this file uses the cleaned data file above. Run `clean_data.Rmd` first.
+
+### 3. `parallel_trends.Rmd`
+Performs a parallel trends analysis of the EPD and SPD data for each priority group, comparing average response times of each agency pre-shutdown by priority group.
+> Note: this file uses the cleaned data file above. Run `clean_data.Rmd` first.
+
+### 4. `diff_in_diff.Rmd`
+Performs a difference-in-differences study of the EPD and SPD data for each priority group, looking at how average response times changed in Eugene after CAHOOTS shut down, using Springfield as a control. 
+> Note: this file uses the cleaned data file above. Run `clean_data.Rmd` first.
+
+> Refer to the individual `README.md` files in the `analysis/` and `data cleaning/` folders for further information about each process.
