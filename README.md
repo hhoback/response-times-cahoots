@@ -10,7 +10,7 @@ For more details, see the individual README files in the cleaning and analysis f
 
 ## File Structure
 Reference this file structure before running any notebooks to ensure everything is in the right place and runs correctly.
-
+```
 `DSCI 410 Research Project/`
 └── `data/`
 │   ├── `2015-2025 SPD Calls for Service.xlsx`
@@ -31,3 +31,4 @@ Reference this file structure before running any notebooks to ensure everything 
 ├── `initial_analysis.Rmd`
 ├── `parallel_trends.Rmd`
 └── `diff_in_diff.Rmd`
+```
