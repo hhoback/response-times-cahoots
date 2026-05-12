@@ -40,19 +40,20 @@ The goal of this stage is to:
 
 > Note: Because of GitHUB file size limits, the cleaned data and results files are not included in this repository. To produce the cleaned dataset and results, respectively:
 - See README.md in the data cleaning folder
-- See [How to Run] (How to Run) section below
+- See "How to Run" section below
 
 ## How to Run
+Make sure you have met the requirements in the "Requirements" section of the main `README.md` file, have obtained the cleaned and combined dataset of Eugene and Springfield calls from the `data cleaning` section of this repository, and the `cleaned_eug_spd.csv` file is in your root directory with the .Rmd files.
 
-Run all chunks in the Rmd file `initial_analysis.Rmd`.
-Run all chunks in the Rmd file `parallel_trends.Rmd`.
-Run all chunks in the Rmd file `diff_in_diff.Rmd`.
+1. Run all chunks in the Rmd file `initial_analysis.Rmd`.
+2. Run all chunks in the Rmd file `parallel_trends.Rmd`.
+3. Run all chunks in the Rmd file `diff_in_diff.Rmd`.
 - Make sure packages get imported first, and the chunks are run in order to prevent errors and messing up the data.
 
 ## Dependencies
 
-This project uses the following R packages:
+This section uses the following R packages:
 
 - tidyverse
-- ggplot2
 - stats
+- ggplot2
