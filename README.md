@@ -11,23 +11,23 @@ For more details, see the individual README files in the cleaning and analysis f
 ## File Structure
 Reference this file structure before running any notebooks to ensure everything is in the right place and runs correctly.
 
-DSCI 410 Research Project/
-└── data/
-│   ├── 2015-2025 SPD Calls for Service.xlsx
-│   ├── 2015-2025 SPD Responding Units.xlsx
-│   ├── EugeneCAD2015noloc.csv
-│   ├── EugeneCAD2016noloc.csv
-│   ├── EugeneCAD2017noloc.csv
-│   ├── EugeneCAD2018noloc.csv
-│   ├── EugeneCAD2019noloc.csv
-│   ├── EugeneCAD2020noloc.csv
-│   ├── EugeneCAD2021noloc.csv
-│   ├── EugeneCAD2022noloc.csv
-│   ├── EugeneCAD2023noloc.csv
-│   ├── EugeneCAD2024noloc.csv
-│   └── EugeneCAD2025noloc.csv
-├── cleaned_eug_spd.csv                         !- This file is re-generated when running files -!
-├── clean_data.Rmd
-├── initial_analysis.Rmd
-├── parallel_trends.Rmd
-└── diff_in_diff.Rmd
+`DSCI 410 Research Project/`
+└── `data/`
+│   ├── `2015-2025 SPD Calls for Service.xlsx`
+│   ├── `2015-2025 SPD Responding Units.xlsx`
+│   ├── `EugeneCAD2015noloc.csv`
+│   ├── `EugeneCAD2016noloc.csv`
+│   ├── `EugeneCAD2017noloc.csv`
+│   ├── `EugeneCAD2018noloc.csv`
+│   ├── `EugeneCAD2019noloc.csv`
+│   ├── `EugeneCAD2020noloc.csv`
+│   ├── `EugeneCAD2021noloc.csv`
+│   ├── `EugeneCAD2022noloc.csv`
+│   ├── `EugeneCAD2023noloc.csv`
+│   ├── `EugeneCAD2024noloc.csv`
+│   └── `EugeneCAD2025noloc.csv`
+├── `cleaned_eug_spd.csv`                     !- This file is re-generated when running files -!
+├── `clean_data.Rmd`
+├── `initial_analysis.Rmd`
+├── `parallel_trends.Rmd`
+└── `diff_in_diff.Rmd`
