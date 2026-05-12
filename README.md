@@ -40,7 +40,7 @@ DSCI 410 Research Project/
 ## How to Run
 Before running any files, ensure you have met all [Requirements] (#requirements).
 
-### 1. 'clean_data.Rmd'
+### 1. `clean_data.Rmd`
 Cleans and prepares the raw data and produces an output file of the cleaned data:
 - `cleaned_eug_spd.csv` - Eugene and Springfield call data cleaned and combined into one dataset
 > Note: Each step below uses the cleaned data file produced by this step. Run `clean_data.Rmd` first.
