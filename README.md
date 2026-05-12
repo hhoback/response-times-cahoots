@@ -43,17 +43,16 @@ Before running any files, ensure you have met all [Requirements] (#requirements)
 ### 1. 'clean_data.Rmd'
 Cleans and prepares the raw data and produces an output file of the cleaned data:
 - `cleaned_eug_spd.csv` - Eugene and Springfield call data cleaned and combined into one dataset
+> Note: Each step below uses the cleaned data file produced by this step. Run `clean_data.Rmd` first.
 
 ### 2. `initial_analysis.Rmd`
 Performs an initial analysis of the data, plotting average response times over time by agency.
-> Note: this file uses the cleaned data file above. Run `clean_data.Rmd` first.
 
 ### 3. `parallel_trends.Rmd`
 Performs a parallel trends analysis of the EPD and SPD data for each priority group, comparing average response times of each agency pre-shutdown by priority group.
-> Note: this file uses the cleaned data file above. Run `clean_data.Rmd` first.
 
 ### 4. `diff_in_diff.Rmd`
 Performs a difference-in-differences study of the EPD and SPD data for each priority group, looking at how average response times changed in Eugene after CAHOOTS shut down, using Springfield as a control. 
-> Note: this file uses the cleaned data file above. Run `clean_data.Rmd` first.
 
+#
 > Refer to the individual `README.md` files in the `analysis/` and `data cleaning/` folders for further information about each process.
