@@ -8,8 +8,9 @@ This folder contains scripts for cleaning the raw Eugene CAD data and Springfiel
 The goal of this stage is to:
 - Stack each year of data per city 
 - Clean and standardize raw call data
-- Combine datasets into a single dataset for easy analysis
-- Create new variables for classifying calls
+- Calculate response times and combine datasets into a single dataset for easy analysis
+- Filter out unusable, bad, or missing data
+- Convert clean data into a .csv file for use in analyis
 
 ## Folder Contents
 
@@ -32,7 +33,7 @@ The goal of this stage is to:
 
 ## Output Files
 
-- `cleaned_eug_spd.csv`: Cleaned and merged EPD and SPD call data containing variables: `yr`, `inci_id`, `agency`, `calltime`, `priority`, `callsource`, `mins_to_arrv`
+- `cleaned_eug_spd.csv`: Cleaned and merged EPD and SPD call data containing variables: `year`, `agency`, `inci_id`, `calltime`, `callsoure`, `priority`, `nature`, `primeunit`, and `mins_to_arrv`. 
 
 ## How to Run
 
@@ -43,10 +44,9 @@ The goal of this stage is to:
 
 ## Dependencies
 
-This project uses the following R packages:
+This section uses the following R packages:
 
 - readxl
 - tidyverse
 - lubridate
-- stats
-- ggplot2
+- janitor
