@@ -1,15 +1,15 @@
 # Analysis of Emergency Response Times in Eugene and Springfield
 
-This repository contains data cleaning, processing, and statistical analysis of police department response times in Eugene and Springfield, OR from 2015 to 2025. The analysis compares response times over time between the two cities and uses Springfield as a control to see how response times changed in Eugene after CAHOOTS shutdown. These analyses are done by grouping each priority level into four groups to account for different response times among priority levels.  
+This repository contains data cleaning, processing, and statistical analysis of police department response times in Eugene and Springfield, OR from 2015 to 2025. The analysis compares response times over time between the two cities and uses Springfield as a control to see how response times changed in Eugene after CAHOOTS shutdown. These analyses are done by grouping priority levels together to account for different response times among calls with different priorities.  
 
 The repository is organized into two main parts:
 - `/data cleaning`: contains data cleaning and preparation notebooks
-- `/analysis`: contains statistical analysis notebooks
+- `/analysis`: contains statistical analysis notebooks and results
 
 For more details, see the individual README files in the cleaning and analysis folders.
 
 ## Requirements
-All components of this project use R and the notebooks were created using RStudio. Make sure you have a program that can run R installed on your computer with the most recentversion.
+All components of this project use R and the notebooks were created using RStudio. Make sure you have a program installed on your computer that can run R with the most recent version.
 
 ## File Structure
 Reference this file structure before running any notebooks to ensure everything is in the right place and runs correctly.
@@ -31,9 +31,7 @@ DSCI 410 Research Project/
 │   └── EugeneCAD2025noloc.csv
 ├── cleaned_eug_spd.csv                     !- This file is re-generated when running files -!
 ├── clean_data.Rmd
-├── initial_analysis.Rmd
-├── parallel_trends.Rmd
-└── diff_in_diff.Rmd
+└── analysis.Rmd
 ```
 > Note: The cleaned .csv files are intentionally located in the root directory, not in data/
 
@@ -45,14 +43,8 @@ Cleans and prepares the raw data and produces an output file of the cleaned data
 - `cleaned_eug_spd.csv` - Eugene and Springfield call data cleaned and combined into one dataset
 > Note: Each step below uses the cleaned data file produced by this step. Run `clean_data.Rmd` first.
 
-### 2. `initial_analysis.Rmd`
-Performs an initial analysis of the data, plotting average response times over time by agency.
-
-### 3. `parallel_trends.Rmd`
-Performs a parallel trends analysis of the EPD and SPD data for each priority group, comparing average response times of each agency pre-shutdown by priority group.
-
-### 4. `diff_in_diff.Rmd`
-Performs a difference-in-differences study of the EPD and SPD data for each priority group, looking at how average response times changed in Eugene after CAHOOTS shut down, using Springfield as a control. 
+### 2. `analysis.Rmd`
+Performs a full analysis of the EPD and SPD data for each priority group. Compares average response times over time between agencies, performing a parallel trends analysis on the pre-shutdown data. Performs a difference-in-differences study of the EPD and SPD data for each priority group, looking at how average response times changed in Eugene after CAHOOTS shut down, using Springfield as a control. 
 
 #
 > Refer to the individual `README.md` files in the `analysis/` and `data cleaning/` folders for further information about each process.
