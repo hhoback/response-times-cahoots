@@ -1,5 +1,5 @@
 
-# Data Analyis
+# Data Analysis
 
 This folder contains scripts for performing data analysis on the cleaned and processed Eugene and Springfield CAD data.
 
