@@ -54,3 +54,4 @@ This section uses the following R packages:
 - stats
 - ggplot2
 - fixest
+- broom
