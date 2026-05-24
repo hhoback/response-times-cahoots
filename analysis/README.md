@@ -19,7 +19,7 @@ The goal of this stage is to:
 - Visualizes parallel trends, runs a regression on these trends, and outputs results that determine if DiD can occur
 - Performs a difference-in-differences analysis on each priority group for the Eugene CAD data by controlling for Springfield, estimating the model, determining causal effect, controlling for other variables, and plotting the results.
 
-- Output: `results_dd.csv`, `results_pt.csv`, `response_times.png`, `parallel_trends.png`, `response_times12.png`, `response_times34.png`, `response_times5.png`, `coefficients.png`, p-values and coefficients
+- Output: `results_dd.csv`, `results_pt.csv`, `plot_overall.png`, `plot_pt.png`, `plot_12.png`, `plot_34.png`, `plot_5.png`, `coefficients.png`
 
 ## Input Files
 
@@ -27,9 +27,13 @@ The goal of this stage is to:
 
 ## Output Files:
 
-- `results_dd.csv`: DataFrame containing test statistics and p-values from difference-in-differences analysis
-- `results_pt.csv`: DataFrame containing test statistics and p-values from parallel trends analysis
-- Line plots, coefficient plots, and all visualizations of results
+- `results_pt.csv` - Dataframe of test statistics from the parallel trends analysis
+- `results_dd.csv` - Dataframe of test statistics from the difference-in-differences analysis
+- `plot_overall.png` - Image of the plot of average response times over time
+- `plot_pt.png` - Image of the plot of the pre-shutdown trends for each priority group 
+- `plot_12.png` - Image of the plot of average response times over time for the 'emergency' priority group (1-2)
+- `plot_34.png` - Image of the plot of average response times over time for the 'investigative' priority group (3-4)
+- `plot_5.png` - Image of the plot of average response times over time for the 'service' priority group (5)
 
 
 > Note: Because of GitHUB file size limits, the cleaned data and results files are not included in this repository. To produce the cleaned dataset and results, respectively:
