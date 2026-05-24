@@ -47,19 +47,11 @@ DSCI 410 Research Project/
 Before running any files, ensure you have met all [Requirements] (#requirements).
 
 ### 1. Run all chunks in `clean_data.Rmd`
-Cleans and prepares the raw data and produces an output file of the cleaned data:
-- `cleaned_eug_spd.csv` - Eugene and Springfield call data cleaned and combined into one dataset
+Cleans and prepares the raw data and produces an output file of the cleaned data, detailed in the individual `README.md` file in the `data cleaning` folder.
 > Note: Each step below uses the cleaned data file produced by this step. Run `clean_data.Rmd` first.
 
 ### 2. Run all chunks in `analysis.Rmd`
-Performs a full analysis of the EPD and SPD data for each priority group. Compares average response times over time between agencies, performing a parallel trends analysis on the pre-shutdown data. Performs a difference-in-differences study of the EPD and SPD data for each priority group, looking at how average response times changed in Eugene after CAHOOTS shut down, using Springfield as a control. Produces output files of the analysis:
-- `results_pt.csv` - Dataframe of test statistics from the parallel trends analysis
-- `results_dd.csv` - Dataframe of test statistics from the difference-in-differences analysis
-- `plot_overall.png` - Image of the plot of average response times over time
-- `plot_pt.png` - Image of the plot of the pre-shutdown trends for each priority group 
-- `plot_12.png` - Image of the plot of average response times over time for the 'emergency' priority group (1-2)
-- `plot_34.png` - Image of the plot of average response times over time for the 'investigative' priority group (3-4)
-- `plot_5.png` - Image of the plot of average response times over time for the 'service' priority group (5)
+Performs a full analysis of the EPD and SPD data for each priority group. Compares average response times over time between agencies, performing a parallel trends analysis on the pre-shutdown data. Performs a difference-in-differences study of the EPD and SPD data for each priority group, looking at how average response times changed in Eugene after CAHOOTS shut down, using Springfield as a control. Produces output files of the analysis, detailed in the individual `README.md` file in the `analysis/` folder. 
 
 #
 > Refer to the individual `README.md` files in the `analysis/` and `data cleaning/` folders for further information about each process.
