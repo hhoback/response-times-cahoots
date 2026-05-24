@@ -29,9 +29,17 @@ DSCI 410 Research Project/
 │   ├── EugeneCAD2023noloc.csv
 │   ├── EugeneCAD2024noloc.csv
 │   └── EugeneCAD2025noloc.csv
+└── figures/                                !- This folder is created after running files -!
+│   ├── plot_5.png                          !- This file is re-generated when running files -!
+│   ├── plot_12.png                         !- This file is re-generated when running files -!
+│   ├── plot_34.png                         !- This file is re-generated when running files -!
+│   ├── plot_overall.png                    !- This file is re-generated when running files -!
+│   ├── plot_pt.png                         !- This file is re-generated when running files -!
+├── analysis.Rmd
 ├── cleaned_eug_spd.csv                     !- This file is re-generated when running files -!
 ├── clean_data.Rmd
-└── analysis.Rmd
+├── results_dd.csv                          !- This file is re-generated when running files -!
+└── results_pt.csv                          !- This file is re-generated when running files -!
 ```
 > Note: The cleaned .csv files are intentionally located in the root directory, not in data/
 
