@@ -19,7 +19,7 @@ The goal of this stage is to:
 - Visualizes parallel trends, runs a regression on these trends, and outputs results that determine if DiD can occur
 - Performs a difference-in-differences analysis on each priority group for the Eugene CAD data by controlling for Springfield, estimating the model, determining causal effect, controlling for other variables, and plotting the results.
 
-- Output: `results_dd.csv`, `results_pt.csv`, `plot_overall.png`, `plot_pt.png`, `plot_12.png`, `plot_34.png`, `plot_5.png`, `coefficients.png`
+- Output: `results_pt.csv`, `results_did.csv`, `results_pt_pg.csv`, `results_did_pg.csv`,`plot_overall.png`, `pt_facet.png`, `response_times_12.png`, `response_times_34.png`, `response_times_5.png`, `freq_pg.png`
 
 ## Input Files
 
@@ -27,13 +27,16 @@ The goal of this stage is to:
 
 ## Output Files:
 
-- `results_pt.csv` - Dataframe of test statistics from the parallel trends analysis
-- `results_dd.csv` - Dataframe of test statistics from the difference-in-differences analysis
+- `results_pt.csv` - Dataframe of test statistics from the parallel trends analysis of the full dataset
+- `results_did.csv` - Dataframe of test statistics from the difference-in-differences analysis of the full dataset
+- `results_pt_pg.csv` - Dataframe of test statistics from the parallel trends analysis of each priority group
+- `results_did_pg.csv` - Dataframe of test statistics from the difference-in-differences analysis of each priority group
 - `plot_overall.png` - Image of the plot of average response times over time
-- `plot_pt.png` - Image of the plot of the pre-shutdown trends for each priority group 
-- `plot_12.png` - Image of the plot of average response times over time for the 'emergency' priority group (1-2)
-- `plot_34.png` - Image of the plot of average response times over time for the 'investigative' priority group (3-4)
-- `plot_5.png` - Image of the plot of average response times over time for the 'service' priority group (5)
+- `pt_facet.png` - Image of the plot of the pre-shutdown trends for each priority group 
+- `response_times_12.png` - Image of the plot of average response times over time for the 'emergency' priority group (1-2)
+- `response_times_34.png` - Image of the plot of average response times over time for the 'investigative' priority group (3-4)
+- `response_times_5.png` - Image of the plot of average response times over time for the 'service' priority group (5)
+- `freq_pg.png` - Image of the plot of call priority volume composition over time in each city
 
 
 > Note: Because of GitHUB file size limits, the cleaned data and results files are not included in this repository. To produce the cleaned dataset and results, respectively:
