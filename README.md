@@ -15,6 +15,9 @@ All components of this project use R and the notebooks were created using RStudi
 Reference this file structure before running any notebooks to ensure everything is in the right place and runs correctly.
 ```
 DSCI 410 Research Project/
+├── analysis.Rmd
+├── cleaned_eug_spd.csv                     !- This file is re-generated when running files -!
+├── clean_data.Rmd
 └── data/
 │   ├── 2015-2025 SPD Calls for Service.xlsx
 │   ├── 2015-2025 SPD Responding Units.xlsx
@@ -30,16 +33,17 @@ DSCI 410 Research Project/
 │   ├── EugeneCAD2024noloc.csv
 │   └── EugeneCAD2025noloc.csv
 └── figures/                                !- This folder is created after running files -!
-│   ├── plot_5.png                          !- This file is re-generated when running files -!
-│   ├── plot_12.png                         !- This file is re-generated when running files -!
-│   ├── plot_34.png                         !- This file is re-generated when running files -!
+│   ├── freq_pg.png                         !- This file is re-generated when running files -!
 │   ├── plot_overall.png                    !- This file is re-generated when running files -!
-│   ├── plot_pt.png                         !- This file is re-generated when running files -!
-├── analysis.Rmd
-├── cleaned_eug_spd.csv                     !- This file is re-generated when running files -!
-├── clean_data.Rmd
-├── results_dd.csv                          !- This file is re-generated when running files -!
-└── results_pt.csv                          !- This file is re-generated when running files -!
+│   ├── pt_facet.png                        !- This file is re-generated when running files -!
+│   ├── response_times_12.png               !- This file is re-generated when running files -!
+│   ├── response_times_34.png               !- This file is re-generated when running files -!
+│   └── response_times_4.png                !- This file is re-generated when running files -!
+└── results/                                !- This folder is created after running files -!
+│   ├── results_did_pg.csv                  !- This file is re-generated when running files -!
+│   ├── results_did.csv                     !- This file is re-generated when running files -!
+│   ├── results_pt_pg.csv                   !- This file is re-generated when running files -!
+│   └── results_pt.csv                      !- This file is re-generated when running files -!
 ```
 > Note: The cleaned .csv files are intentionally located in the root directory, not in data/
 
