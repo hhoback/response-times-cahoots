@@ -1,0 +1,312 @@
+---
+title: "Analysis: EPD Response Times"
+author: "Harrison Hoback"
+date: "`r Sys.Date()`"
+output: html_notebook
+---
+
+``` {r Load packages}
+library(tidyverse)
+library(stats)
+library(ggplot2)
+library(fixest)
+library(broom)
+```
+
+## Data Preparation
+
+``` {r Load clean data}
+clean_data <- read.csv("cleaned_eug_spd.csv") %>%
+  mutate(
+    # Create a monthly date variable
+    year_month = as.Date(year_month), 
+    )
+```
+
+``` {r Define new variables and filter dataset}
+clean_data <- clean_data %>% 
+  mutate(
+    # Group priority levels into groups
+    priority_group = case_when(
+      priority %in% c(1, 2) ~ "emergency (1-2)",
+      priority %in% c(3, 4) ~ "investigative (3-4)",
+      priority == 5 ~ "service (5)",
+      TRUE ~ NA_character_),
+    # Define treatment and control group
+    treatment = agency == "EPD",
+    # Define treatment time period
+    post_shutdown = ifelse(calltime > as.POSIXct("2025-04-05"), 1, 0)
+    ) %>%
+  filter(year_month < as.Date("2026-01-01"))
+```
+
+```{r Create datasets for analysis of response times}
+overall_did <- clean_data %>%
+  # Group observations by month and treatment
+  group_by(year_month, agency) %>%
+  summarise(
+    # Calculate average response time per year
+    avg_response_time = mean(mins_to_arrv, na.rm = TRUE),
+    # Include monthly call counts in the dataset
+    n = n(),
+    .groups = "drop"
+  )
+
+pt_overall <- overall_did  %>%
+  # Filter the dataset for pre-shutdown dates for parallel trends
+  filter(year_month < as.Date("2025-04-05")) %>%
+  arrange(year_month) %>%
+  mutate(year_month_num = as.numeric(year_month))
+```
+
+``` {r Create datasets for analyiss of response times by priority group}
+priority_did <- clean_data %>%
+  # Group observations by month, treatment, and priority group
+  group_by(year_month, agency, priority_group) %>%
+  summarise(
+    # Calculate average response time per group per year
+    avg_response_time = mean(mins_to_arrv, na.rm = TRUE),
+    # Include monthly call counts in the dataset
+    n = n(),
+    .groups = "drop"
+  )
+
+pt_priority <- priority_did %>%
+  # Filter the dataset for pre-shutdown dates for parallel trends
+  filter(year_month < as.Date("2025-04-05")) %>%
+  arrange(year_month) %>%
+  mutate(year_month_num = as.numeric(year_month))
+```
+
+``` {r Create common theme}
+# Create a minimum and maximum x-value for consistency among graphs
+x_min <- min(clean_data$year_month, na.rm = TRUE)
+x_max <- max(clean_data$year_month, na.rm = TRUE)
+
+# Create a common theme for consistency among graphs
+common_theme <- list(
+  scale_x_date(
+    limits = c(x_min, x_max),
+    date_breaks = "2 years" ,
+    date_labels = "%Y"
+  ),
+  labs(
+    x = "Year",
+    y = "Average Response Time (Minutes)",
+    color = "Agency"
+  )
+)
+```
+
+## Analysis of Response Times
+
+``` {r Plot the overall response times}
+plot_overall <- ggplot(
+  overall_did, 
+       aes(
+         x = year_month, 
+         y = avg_response_time, 
+         color = agency, 
+         group = agency)) +
+  geom_line(linewidth = 0.5) +
+  ggtitle("Monthly Average of Police Response Times (2015–2025): Eugene vs Springfield") +
+  common_theme +
+  geom_vline(
+    xintercept = as.Date("2025-04-05"), color = "black", linetype = "dashed", size = 1
+    )
+
+plot_overall
+```
+
+``` {r Perform parallel trends regression test on all data}
+# Create a dataframe of regression results
+pt_model <- feols(
+  # Perform regression of average response times on time period and agency
+  avg_response_time ~ year_month_num * agency,
+  data = pt_overall
+)
+
+summary(pt_model)
+results_pt <- broom::tidy(pt_model)
+
+results_pt
+```
+
+``` {r Perform difference-in-differences regression test on all data}
+# Create a dataframe of regression results
+did_model <- feols(
+  # Perform regression test of response times on treatment and time period, controlling for agency and month 
+  mins_to_arrv ~ treatment * post_shutdown | agency + year_month,
+  data = clean_data
+)
+
+# Summarize and tidy results
+summary(did_model)
+results_did <- broom::tidy(did_model)
+
+results_did
+```
+
+## Analysis of Response Times by Priority Group
+
+```{r Visualize parallel trends by priority group}
+# Plot average response times over time per priority group
+pt_facet <- ggplot(
+  pt_priority, 
+       aes(
+         x = year_month, 
+         y = avg_response_time, 
+         color = agency, 
+         group = agency)
+  ) +
+  geom_line() +
+  labs(
+    x = "Year",
+    y = "Average Response Time (minutes)",
+    color = "Agency"
+  ) +
+  ggtitle("Pre-Shutdown Monthly Response Time Trends: Eugene vs Springfield") +
+  facet_wrap(~ priority_group)
+
+pt_facet
+```
+
+``` {r Perform parallel trends regression test by priority group}
+# Create a dataframe of results for each priority group
+results_pt_pg <- pt_priority %>%
+  group_by(priority_group) %>%
+  nest() %>%
+  mutate(
+    model = map(data, ~ feols(
+      # Perform regression of average response times on time period and agency for each priority group
+      avg_response_time ~ year_month_num * agency, data = .x)
+                ),
+    tidy_model = map(model, tidy)
+  ) %>%
+  select(priority_group, tidy_model) %>%
+  unnest(tidy_model)
+
+results_pt_pg
+```
+
+``` {r Perform difference-in-differences regression test by priority group}
+# Create a dataframe of results for each priority group 
+results_did_pg <- tibble(
+  priority_group = c(
+    "emergency (1-2)",
+    "investigative (3-4)",
+    "service (5)"
+  )
+) %>%
+  mutate(
+    model = map(priority_group, ~ feols(
+      # Perform regression test of response times on treatment and time period for each priority group, controlling for agency and month
+      mins_to_arrv ~ treatment * post_shutdown | agency + year_month,
+        data = filter(clean_data, priority_group == .x)
+      )
+    ),
+    tidy_model = map(model, tidy)
+  ) %>%
+  select(priority_group, tidy_model) %>%
+  unnest(tidy_model)
+
+results_did_pg
+```
+
+``` {r Plot emergency priority group (1-2) response times}
+response_times_12 <- ggplot(
+  filter(
+    priority_did, 
+    priority_group == "emergency (1-2)"), 
+       aes(
+         x = year_month, 
+         y = avg_response_time, 
+         color = agency, 
+         group = agency)) +
+  geom_line(linewidth = 0.5) +
+  ggtitle("Monthly Response Times: Eugene vs Springfield (Priority 1-2)") +
+  common_theme +
+  geom_vline(
+    xintercept = as.Date("2025-04-05"), color = "black", linetype = "dashed", size = 1
+    )
+
+response_times_12
+```
+
+
+``` {r Plot investigative priority group (3-4) response times}
+response_times_34 <- ggplot(
+  filter(
+    priority_did, 
+    priority_group == "investigative (3-4)"), 
+       aes(
+         x = year_month, 
+         y = avg_response_time, 
+         color = agency, 
+         group = agency)) +
+  geom_line(linewidth = 0.5) +
+  ggtitle("Monthly Response Times: Eugene vs Springfield (Priority 3-4)") +
+  common_theme + 
+  geom_vline(
+    xintercept = as.Date("2025-04-05"), color = "black", linetype = "dashed", size = 1
+    )
+
+response_times_34
+```
+
+``` {r Plot service priority group (5) response times}
+response_times_5 <- ggplot(
+  filter(
+    priority_did, 
+    priority_group == "service (5)"), 
+       aes(
+         x = year_month, 
+         y = avg_response_time, 
+         color = agency, 
+         group = agency)) +
+  geom_line(linewidth = 0.5) +
+  ggtitle("Monthly Response Times: Eugene vs Springfield (Priority 5)") +
+  common_theme +
+  geom_vline(
+    xintercept = as.Date("2025-04-05"), color = "black", linetype = "dashed", size = 1
+    ) 
+
+response_times_5
+```
+
+``` {r Plot frequency of each priority group}
+freq_pg <- ggplot(priority_did,
+                  aes(x = year_month,
+                      y = n,
+                      fill = priority_group)) +
+  geom_area() +
+  facet_wrap(~agency) +
+  labs(
+    x = "Year",
+    y = "Number of Calls",
+    fill = "Priority Group",
+    title = "Call Priority Volume Composition Over Time"
+  ) 
+
+freq_pg
+```
+
+``` {r Save output files}
+# Create output directories if they do not already exist
+dir.create("figures", showWarnings = FALSE)
+dir.create("results", showWarnings = FALSE)
+
+# Export results to output directories
+write.csv(results_pt, "results/results_pt.csv", row.names = FALSE)
+write.csv(results_did, "results/results_did.csv", row.names = FALSE)
+write.csv(results_pt_pg, "results/results_pt_pg.csv", row.names = FALSE)
+write.csv(results_did_pg, "results/results_did_pg.csv", row.names = FALSE)
+
+ggsave("plot_overall.png", path = "figures", plot_overall, width = 8, height = 5, dpi = 300)
+ggsave("pt_facet.png", path = "figures", pt_facet, width = 8, height = 5, dpi = 300)
+ggsave("response_times_12.png", path = "figures", response_times_12, width = 8, height = 5, dpi = 300)
+ggsave("response_times_34.png", path = "figures", response_times_34, width = 8, height = 5, dpi = 300)
+ggsave("response_times_5.png", path = "figures", response_times_5, width = 8, height = 5, dpi = 300)
+ggsave("freq_pg.png", path = "figures", freq_pg, width = 8, height = 5, dpi = 300)
+
+```
