@@ -1,0 +1,158 @@
+---
+title: "Data Cleaning: EPD Response Times"
+author: "Harrison Hoback"
+date: "`r Sys.Date()`"
+output: html_notebook
+---
+
+### Load packages
+``` {r Load packages}
+library(readxl)
+library(tidyverse)
+library(lubridate)
+library(janitor)
+```
+
+### Load data
+```{r Load data}
+years <- 2015:2025
+
+# Compile city-specific datasets into lists
+eug_dfs <- lapply(years, function(y) {
+  read.csv(paste0("data/EugeneCAD", y, "noloc.csv"))
+})
+
+spd_dfs <- lapply(years, function(y) {
+  read_excel(
+    "data/2015-2025 SPD Calls for Service.xlsx",
+    sheet = as.character(y)
+  ) %>%
+    clean_names()
+})
+```
+
+### Combine datasets
+``` {r Combine datasets}
+# In order to combine the datasets, the priority column must be numeric values, so we convert them
+spd_dfs <- lapply(spd_dfs, function(df) {
+  df$priority <- as.numeric(df$priority)
+  df
+})
+
+# Combine each yearly Eugene and Springfield dataset
+eug_combined <- bind_rows(eug_dfs)
+spd_combined <- bind_rows(spd_dfs)
+```
+
+### Variable formatting
+```{r Variable formatting}
+# Rename columns so that each dataset matches
+spd_combined <- spd_combined %>%
+  rename(
+    agency = responding_agency,
+    inci_id = incident_number,
+    calltime = call_creation_time, 
+    callsource = call_creation_mechanism,
+    nature = initial_call_type,
+    closed_as = final_call_type,
+    primeunit = primary_responding_unit
+    ) %>%
+  # Create a 'year' column for the SPD data
+  mutate(year = year(calltime))
+
+eug_combined <- eug_combined %>%
+  rename(year = yr)
+```
+
+### Data cleaning
+```{r Data cleaning}
+spd_combined <- spd_combined %>%
+  mutate(
+    # Convert the times to datetimes and numbers to make them useable
+    calltime = as.POSIXct(calltime), 
+    first_dispatched_time = excel_numeric_to_date(as.numeric(first_dispatched_time), include_time = TRUE),
+    first_arrival_time = excel_numeric_to_date(as.numeric(first_arrival_time), include_time = TRUE),
+    
+    # Calculate number of minutes to arrive from arrival and dispatch times 
+    mins_to_arrv = as.numeric(difftime(first_arrival_time, first_dispatched_time,units = "mins"))
+    )
+```
+
+``` {r }
+eug_combined <- eug_combined %>%
+  mutate(
+    # Convert times to datetimes and other variables to numbers to make them useable
+    calltime = as.POSIXct(calltime, tz = "America/Los_Angeles"),
+    secs_to_arrv = as.numeric(secs_to_arrv),
+    secs_to_disp = as.numeric(secs_to_disp),
+    year = year(calltime),
+    priority = as.numeric(priority),
+    
+    # Calculate number of minutes to arrive from seconds to arrive
+    mins_to_arrv = (secs_to_arrv - secs_to_disp) / 60
+    )
+```
+
+### Combine datasets
+``` {r Combine datasets}
+# Create a list of common variable names for merging
+cols <- c(
+  "year",
+  "agency",
+  "inci_id",
+  "calltime",
+  "callsource",
+  "priority",
+  "nature",
+  "primeunit",
+  "mins_to_arrv"
+)
+
+# Combine SPD and EPD datasets into one based on common variables of interest
+combined <- bind_rows(
+  select(spd_combined, all_of(cols)),
+  select(eug_combined, all_of(cols))
+)
+```
+
+### Filter data
+``` {r Filter data}
+# Create a list of all prime unit identifiers of CAHOOTS vehicles
+pu_identifiers = c("_1J77", "3J79", "3J78", "3J77", "4J79", "3J81", "3J76", "2J28", "2J29")
+
+filtered <- combined %>%
+  mutate(
+    # Fix spacing and string formatting issues
+    callsource = toupper(trimws(callsource)),
+    agency = trimws(agency),
+    # Convert all values containing "NULL" to actual null values
+    across(where(is.character), ~ na_if(.x, "NULL"))
+  ) %>%
+  filter(
+    # Remove all calls self-reported by the police
+    callsource != "SELF",
+    callsource %in% c("PHONE", "E911", "W911"),
+    
+    # Only include SPD and EPD calls
+    agency %in% c("SPD", "EPD"),
+    is.na(primeunit) | !primeunit %in% pu_identifiers,
+    
+    # Remove all calls that are responded to in less than 30 seconds (unrealistic) and more than 6 hours 
+    mins_to_arrv > 1, mins_to_arrv < 360,
+    
+    # Only look at priority levels 1-5
+    priority <= 5
+  ) %>%
+  
+  # Remove any null values in variables of interest
+  drop_na(year, agency, calltime, priority, mins_to_arrv) %>%
+  
+  # Create a monthly variable 
+  mutate(year_month = floor_date(calltime, "month"))
+```
+
+### Save to CSV
+``` {r Save to CSV}
+write.csv(filtered, "cleaned_eug_spd.csv", row.names = FALSE)
+```
+
